@@ -1,0 +1,173 @@
+{
+  "identity": {
+    "name": "E1: The Anti-AI Designer",
+    "mission": "Build a trading interface that feels like a quantitative hedge fund terminal—dense, dark, precise, and electric.",
+    "core_principles": [
+      "Dark Mode Absolutism: Trading happens in the dark. No light mode toggle.",
+      "Density is Luxury: Show more data, but organize it with strict grids.",
+      "Neon Precision: Use color only for data (Green/Red/Blue). Everything else is obsidian.",
+      "Motion = Data Flow: Animations should feel like live data updates, not decoration."
+    ]
+  },
+  "theme": {
+    "mode": "dark",
+    "strategy": "The Obsidian Terminal",
+    "radius": "0.3rem",
+    "primary_color_intent": "Electric Blue for Actions, Neon Green/Red for Data"
+  },
+  "typography": {
+    "headings": {
+      "family": "Manrope, sans-serif",
+      "weights": ["600", "700", "800"],
+      "usage": "Headings, Hero Sections, Major KPIs",
+      "tracking": "-0.02em"
+    },
+    "body": {
+      "family": "IBM Plex Sans, sans-serif",
+      "weights": ["400", "500"],
+      "usage": "General text, articles, explanations"
+    },
+    "mono": {
+      "family": "JetBrains Mono, monospace",
+      "weights": ["400", "500"],
+      "usage": "Stock prices, tickers, code snippets, financial data tables"
+    },
+    "scale": {
+      "h1": "text-5xl md:text-7xl font-bold tracking-tight",
+      "h2": "text-3xl md:text-4xl font-bold tracking-tight",
+      "h3": "text-2xl font-semibold tracking-tight",
+      "p": "text-base text-muted-foreground leading-relaxed",
+      "mono_sm": "text-xs font-mono tracking-wide uppercase",
+      "mono_lg": "text-xl font-mono tracking-tight"
+    }
+  },
+  "colors": {
+    "background": {
+      "default": "#050505",
+      "paper": "#0A0A0A",
+      "subtle": "#121212"
+    },
+    "foreground": {
+      "default": "#EDEDED",
+      "muted": "#A1A1AA",
+      "subtle": "#52525B"
+    },
+    "primary": {
+      "default": "#3B82F6",
+      "hover": "#2563EB",
+      "foreground": "#FFFFFF"
+    },
+    "data": {
+      "profit": "#10B981",
+      "loss": "#EF4444",
+      "neutral": "#64748B",
+      "warning": "#F59E0B"
+    },
+    "border": {
+      "default": "rgba(255, 255, 255, 0.08)",
+      "active": "rgba(59, 130, 246, 0.5)"
+    },
+    "glass": {
+      "background": "rgba(10, 10, 10, 0.7)",
+      "border": "rgba(255, 255, 255, 0.05)",
+      "blur": "backdrop-blur-xl"
+    }
+  },
+  "visual_enhancers": {
+    "gradients": {
+      "hero_glow": "bg-gradient-to-tr from-blue-900/20 via-background to-background",
+      "card_hover": "hover:bg-gradient-to-b hover:from-white/5 hover:to-transparent"
+    },
+    "shadows": {
+      "neon_glow": "0 0 20px -5px rgba(59, 130, 246, 0.3)",
+      "card_default": "0 1px 0 0 rgba(255,255,255,0.05)"
+    },
+    "borders": {
+      "tracing_beam": "relative rounded-lg border border-white/10 overflow-hidden after:absolute after:inset-0 after:bg-gradient-to-r after:from-transparent after:via-white/10 after:to-transparent after:translate-x-[-100%] hover:after:translate-x-[100%] after:transition-transform after:duration-1000"
+    }
+  },
+  "layout_strategies": {
+    "dashboard": {
+      "type": "Bento Grid (Mode B)",
+      "container": "grid grid-cols-1 md:grid-cols-4 gap-4 p-4 md:p-6",
+      "widgets": {
+        "chart_primary": "col-span-1 md:col-span-3 row-span-2 h-[400px]",
+        "sidebar_list": "col-span-1 md:col-span-1 row-span-2 h-full overflow-hidden",
+        "metric_card": "col-span-1 p-6 flex flex-col justify-between"
+      }
+    },
+    "landing": {
+      "type": "Swiss Grid / Asymmetrical",
+      "hero": "min-h-[90vh] flex flex-col justify-center items-start pt-20",
+      "section_spacing": "py-24 md:py-32"
+    }
+  },
+  "component_rules": {
+    "Button": {
+      "style": "Sharp corners or small radius (rounded-sm). No pill shapes.",
+      "variants": {
+        "default": "bg-primary text-white hover:bg-primary/90 shadow-[0_0_15px_-3px_rgba(59,130,246,0.4)]",
+        "outline": "border-white/10 bg-transparent hover:bg-white/5 text-white"
+      }
+    },
+    "Card": {
+      "style": "bg-[#0A0A0A] border border-white/10 rounded-lg p-6 hover:border-white/20 transition-colors duration-300",
+      "header": "pb-4 mb-4 border-b border-white/5"
+    },
+    "Input": {
+      "style": "bg-black/50 border-white/10 focus:border-primary/50 focus:ring-1 focus:ring-primary/50 rounded-md h-11 text-sm font-mono"
+    },
+    "Charts": {
+      "library": "Recharts (via Shadcn)",
+      "style": "Minimalist. Hide grid lines or make them extremely subtle (stroke='#333'). Use gradients for area fills.",
+      "tooltip": "Custom simplified tooltip. Dark bg, white text, no border."
+    }
+  },
+  "image_urls": {
+    "hero_background": {
+      "url": "https://images.unsplash.com/photo-1760387252509-ecef38b4936e?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "alt": "Abstract digital light trails in dark void",
+      "usage": "Hero section background with heavy overlay (opacity-20)"
+    },
+    "trader_focus": {
+      "url": "https://images.unsplash.com/photo-1639091824355-48221063de7f?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "alt": "Trader with multiple screens",
+      "usage": "About section or 'Pro Tools' feature highlight"
+    },
+    "bull_market": {
+      "url": "https://images.unsplash.com/photo-1655494215364-b1abfaa089cb?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "alt": "Bull statue low poly/abstract",
+      "usage": "Market Basics module cover"
+    },
+    "abstract_data": {
+      "url": "https://images.unsplash.com/photo-1771013304380-dfaf9f928de6?crop=entropy&cs=srgb&fm=jpg&q=85",
+      "alt": "Blue wavy data visualization",
+      "usage": "AI Advisor section background"
+    }
+  },
+  "libraries_to_install": [
+    "framer-motion",
+    "clsx",
+    "tailwind-merge",
+    "recharts",
+    "lucide-react"
+  ],
+  "universal_guidelines": [
+    "NEVER use light mode. The app is strictly dark.",
+    "Use 'text-muted-foreground' for labels, 'text-foreground' for values.",
+    "All financial data (prices, percentages) MUST use 'font-mono'.",
+    "Positive values = text-emerald-500. Negative values = text-red-500.",
+    "Add 'data-testid' to every interactive element (buttons, inputs, links).",
+    "Use 'framer-motion' for page transitions and staggering list items.",
+    "Do not use native HTML 'select' or 'date'; use Shadcn Select and Calendar.",
+    "Ensure all charts have a responsive container (ResponsiveContainer from Recharts)."
+  ],
+  "instructions_to_main_agent": {
+    "step_1": "Install 'framer-motion' immediately.",
+    "step_2": "Update 'tailwind.config.js' to match the 'Obsidian Terminal' color palette.",
+    "step_3": "Configure typography in 'index.css' to import Manrope, IBM Plex Sans, and JetBrains Mono.",
+    "step_4": "Build the 'DashboardLayout' using the Bento Grid strategy.",
+    "step_5": "Create the 'TickerTape' component for the top of the dashboard using the 'mono' font.",
+    "step_6": "Implement the 'TradingChart' using Recharts with the specific neon palette."
+  }
+}
