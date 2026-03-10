@@ -33,7 +33,7 @@ const Sidebar = () => {
           <div className="w-8 h-8 bg-blue-500 rounded flex items-center justify-center">
             <TrendingUp className="w-5 h-5 text-white" />
           </div>
-          <span className="font-heading font-bold text-lg text-white">TradeLearn</span>
+          <span className="font-heading font-bold text-lg text-white">Trading Boi</span>
         </Link>
       </div>
 

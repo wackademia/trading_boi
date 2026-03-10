@@ -29,7 +29,7 @@ const Register = () => {
     setLoading(true);
     try {
       await register(email, password, name);
-      toast.success('Account created! Welcome to TradeLearn');
+      toast.success('Account created! Welcome to Trading Boi');
       navigate('/dashboard');
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Registration failed');
@@ -85,7 +85,7 @@ const Register = () => {
             <div className="w-8 h-8 bg-blue-500 rounded flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-white" />
             </div>
-            <span className="font-heading font-bold text-xl text-white">TradeLearn</span>
+            <span className="font-heading font-bold text-xl text-white">Trading Boi</span>
           </div>
 
           <h2 className="font-heading text-2xl font-bold text-white mb-2">Create Account</h2>

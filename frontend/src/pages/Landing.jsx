@@ -27,7 +27,7 @@ const Landing = () => {
             <div className="w-8 h-8 bg-blue-500 rounded flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-white" />
             </div>
-            <span className="font-heading font-bold text-xl">TradeLearn</span>
+            <span className="font-heading font-bold text-xl">Trading Boi</span>
           </div>
           <div className="flex items-center gap-4">
             <Link to="/login">
@@ -150,7 +150,7 @@ const Landing = () => {
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2 text-white/50 text-sm">
             <TrendingUp className="w-4 h-4" />
-            <span>TradeLearn © 2024</span>
+            <span>Trading Boi © 2024</span>
           </div>
           <p className="text-white/30 text-xs">
             Educational platform. Not financial advice.

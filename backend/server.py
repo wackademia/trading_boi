@@ -2,7 +2,10 @@ from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, UploadFi
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
+try:
+    from motor.motor_asyncio import AsyncIOMotorClient
+except Exception:
+    AsyncIOMotorClient = None
 import os
 import logging
 from pathlib import Path
@@ -14,15 +17,84 @@ import jwt
 import bcrypt
 import httpx
 import base64
-from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
+try:
+    from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
+except Exception:
+    LlmChat = None
+    UserMessage = None
+    ImageContent = None
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
+
+class _InMemoryCursor:
+    def __init__(self, docs):
+        self._docs = list(docs)
+
+    def sort(self, key, direction):
+        reverse = direction == -1
+        self._docs.sort(key=lambda d: d.get(key), reverse=reverse)
+        return self
+
+    async def to_list(self, length):
+        return list(self._docs[:length])
+
+class _InMemoryCollection:
+    def __init__(self):
+        self._docs = []
+
+    async def find_one(self, filter, projection=None):
+        for doc in self._docs:
+            if _matches_filter(doc, filter):
+                return dict(doc)
+        return None
+
+    async def insert_one(self, doc):
+        self._docs.append(dict(doc))
+        return {"inserted_id": doc.get("id")}
+
+    async def update_one(self, filter, update):
+        set_fields = update.get("$set", {})
+        for i, doc in enumerate(self._docs):
+            if _matches_filter(doc, filter):
+                updated = dict(doc)
+                updated.update(set_fields)
+                self._docs[i] = updated
+                return {"matched_count": 1, "modified_count": 1}
+        return {"matched_count": 0, "modified_count": 0}
+
+    def find(self, filter, projection=None):
+        return _InMemoryCursor([dict(d) for d in self._docs if _matches_filter(d, filter)])
+
+def _matches_filter(doc, filter):
+    if not filter:
+        return True
+    for k, v in filter.items():
+        if doc.get(k) != v:
+            return False
+    return True
+
+class _InMemoryDatabase:
+    def __init__(self):
+        self.users = _InMemoryCollection()
+        self.trades = _InMemoryCollection()
+        self.chat_history = _InMemoryCollection()
+
+mongo_url = os.environ.get("MONGO_URL")
+db_name = os.environ.get("DB_NAME")
+if mongo_url and db_name and AsyncIOMotorClient:
+    client = AsyncIOMotorClient(mongo_url)
+    db = client[db_name]
+else:
+    client = None
+    db = _InMemoryDatabase()
+    if mongo_url and db_name and not AsyncIOMotorClient:
+        logger.warning("MongoDB driver not available; using in-memory database for local development.")
+    else:
+        logger.warning("MONGO_URL/DB_NAME not set; using in-memory database for local development.")
 
 # JWT Configuration
 JWT_SECRET = os.environ.get('JWT_SECRET', 'trading_app_secret')
@@ -37,10 +109,6 @@ ALPHA_VANTAGE_KEY = os.environ.get('ALPHA_VANTAGE_KEY', 'demo')
 app = FastAPI(title="Trading Learning App")
 api_router = APIRouter(prefix="/api")
 security = HTTPBearer()
-
-# Configure logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
 
 # ============== MODELS ==============
 
@@ -536,6 +604,8 @@ async def get_progress(current_user: dict = Depends(get_current_user)):
 
 @api_router.post("/advisor/chat")
 async def chat_with_advisor(message: ChatMessage, current_user: dict = Depends(get_current_user)):
+    if not LlmChat or not UserMessage or not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=503, detail="AI service not configured")
     try:
         chat = LlmChat(
             api_key=EMERGENT_LLM_KEY,
@@ -575,6 +645,8 @@ async def chat_with_image(
     current_user: dict = Depends(get_current_user)
 ):
     """Chat with AI advisor including an image for analysis (charts, screenshots, etc.)"""
+    if not LlmChat or not UserMessage or not ImageContent or not EMERGENT_LLM_KEY:
+        raise HTTPException(status_code=503, detail="AI service not configured")
     try:
         # Read and encode image
         image_content = await image.read()
@@ -686,4 +758,5 @@ app.add_middleware(
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
-    client.close()
+    if client:
+        client.close()
