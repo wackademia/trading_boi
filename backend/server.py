@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, status
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, status, UploadFile, File, Form
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -13,7 +13,8 @@ from datetime import datetime, timezone, timedelta
 import jwt
 import bcrypt
 import httpx
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+import base64
+from emergentintegrations.llm.chat import LlmChat, UserMessage, ImageContent
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -558,6 +559,7 @@ Important: Always remind users that this is educational content and not financia
             "user_id": current_user["id"],
             "user_message": message.message,
             "ai_response": response,
+            "has_image": False,
             "timestamp": datetime.now(timezone.utc).isoformat()
         })
         
@@ -565,6 +567,58 @@ Important: Always remind users that this is educational content and not financia
     except Exception as e:
         logger.error(f"AI Advisor error: {e}")
         raise HTTPException(status_code=500, detail="AI service temporarily unavailable")
+
+@api_router.post("/advisor/chat-with-image")
+async def chat_with_image(
+    message: str = Form(...),
+    image: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user)
+):
+    """Chat with AI advisor including an image for analysis (charts, screenshots, etc.)"""
+    try:
+        # Read and encode image
+        image_content = await image.read()
+        image_base64 = base64.b64encode(image_content).decode('utf-8')
+        
+        chat = LlmChat(
+            api_key=EMERGENT_LLM_KEY,
+            session_id=f"trading-advisor-{current_user['id']}-vision",
+            system_message="""You are an expert trading advisor and chart analyst. When analyzing images:
+1. Identify chart patterns (head and shoulders, double tops/bottoms, triangles, etc.)
+2. Note key support and resistance levels
+3. Analyze trend direction and strength
+4. Identify any technical indicators visible (RSI, MACD, moving averages)
+5. Provide educational insights about what you observe
+6. Suggest what traders typically look for in similar setups
+
+Important: This is educational analysis only, not financial advice. Always recommend users do their own research."""
+        ).with_model("openai", "gpt-5.2")
+        
+        # Create ImageContent for the image
+        img_content = ImageContent(image_base64=image_base64)
+        
+        # Create message with image
+        user_msg = UserMessage(
+            text=message or "Please analyze this trading chart and provide insights.",
+            file_contents=[img_content]
+        )
+        
+        response = await chat.send_message(user_msg)
+        
+        # Store chat history (without storing the full image)
+        await db.chat_history.insert_one({
+            "id": str(uuid.uuid4()),
+            "user_id": current_user["id"],
+            "user_message": f"[Image attached] {message}",
+            "ai_response": response,
+            "has_image": True,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        })
+        
+        return {"response": response}
+    except Exception as e:
+        logger.error(f"AI Advisor image error: {e}")
+        raise HTTPException(status_code=500, detail="AI image analysis service temporarily unavailable")
 
 @api_router.get("/advisor/tips")
 async def get_trading_tips(current_user: dict = Depends(get_current_user)):
